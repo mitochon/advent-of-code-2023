@@ -43,6 +43,6 @@ object Day1 extends App {
   def getLines(file: File) = Source.fromFile(file).getLines()
 
   val file = Paths.get("src/main/resources/day1/input").toFile
-  println("Part 1: " + getLines(file).map(getDigits).foldLeft(0)(_ + _))
-  println("Part 2: " + getLines(file).map(getDigitsWithLiterals).foldLeft(0)(_ + _))
+  println("Part 1: " + getLines(file).map(getDigits).sum)
+  println("Part 2: " + getLines(file).map(getDigitsWithLiterals).sum)
 }
