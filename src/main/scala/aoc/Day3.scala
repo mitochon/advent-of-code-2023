@@ -27,12 +27,6 @@ object Day3 extends App {
       .map { case (s, col) => Symbol(s, Coord(row, col)) }
   }
 
-  def parseParts2(line: String, row: Int): Seq[Part] = {
-    val numbers = numberRegex.findAllIn(line).map(_.toInt).toSeq
-    val indices = numbers.map(n => line.indexOf(n.toString))
-    numbers.zip(indices).map { case (n, col) => Part(n, Coord(row, col)) }
-  }
-
   def parseParts(line: String, row: Int): Seq[Part] = {
     def makePart(digits: String, index: Int) = Part(digits.toInt, Coord(row, index + 1 - digits.size))
     @tailrec
