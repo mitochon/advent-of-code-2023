@@ -15,6 +15,10 @@ object Day3 extends App {
         }
       }
     }
+    def withNParts(n: Int, coordMap: Map[Coord, Part]): Set[Part] = {
+      val matchingParts = adjacentCoords().flatMap(coordMap.get).toSet
+      if (matchingParts.size == n) matchingParts else Set()
+    }
   }
   case class Part(n: Int, c: Coord) {
     def coords(): Seq[Coord] = (0 until n.toString.size).map { i => Coord(c.row, c.col + i) }
@@ -42,18 +46,32 @@ object Day3 extends App {
     build(Nil, "", -1, line.zipWithIndex.filter(_._1.isDigit).toList).reverse
   }
 
-  val file = getResourceFile("day3/input")
-  val symbols = getLines(file).zipWithIndex.flatMap {
-    case (line, row) => parseSymbols(line, row)
-  }
-  val parts = getLines(file).zipWithIndex.flatMap {
-    case (line, row) => parseParts(line, row)
+  def calcGearRatio(parts: Set[Part]): Int = {
+    parts.foldLeft(1)(_ * _.n)
   }
 
+  val file = getResourceFile("day3/input")
+
+  val symbols = getLines(file).zipWithIndex.flatMap {
+    case (line, row) => parseSymbols(line, row)
+  }.toList
+  val parts = getLines(file).zipWithIndex.flatMap {
+    case (line, row) => parseParts(line, row)
+  }.toList
+
+  // part1
   val validCoords = symbols.flatMap(_.adjacentCoords()).toSet
-  val validParts = parts.filter(p => p.coords().exists(c => validCoords.contains(c))).toList
+  val validParts = parts.filter(p => p.coords().exists(c => validCoords.contains(c)))
   // debug
   validParts.groupBy(_.c.row).toList.sortBy(_._1).foreach { case (row, parts) => println(s"$row: ${parts.map(_.n)}") }
 
+  // part2
+  val coordMap = parts.flatMap(p => p.coords().map(c => (c, p))).toMap
+  val gearRatios = symbols.filter(_.s == '*')
+    .map(_.withNParts(2, coordMap))
+    .filter(_.nonEmpty)
+    .map(calcGearRatio)
+
   println(validParts.map(_.n).sum)
+  println(gearRatios.sum)
 }
