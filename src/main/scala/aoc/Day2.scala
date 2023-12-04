@@ -1,9 +1,5 @@
 package aoc
 
-import java.io.File
-import java.nio.file.Paths
-import scala.io.Source
-
 object Day2 extends App {
 
   private val redRegex = """(\d+) red""".r
@@ -45,9 +41,7 @@ object Day2 extends App {
     }
   }
 
-  def getLines(file: File) = Source.fromFile(file).getLines()
-  val file = Paths.get("src/main/resources/day2/input").toFile
-
+  val file = getResourceFile("day2/input")
   val constraint = RBG(12, 14, 13)
   val games = getLines(file).map(Game(_)).toList
   val powers = games.map(_.rbg.power())

@@ -1,9 +1,5 @@
 package aoc
 
-import java.io.File
-import java.nio.file.Paths
-import scala.io.Source
-
 object Day1 extends App {
 
   // part1
@@ -40,9 +36,7 @@ object Day1 extends App {
     d1 * 10 + d2
   }
 
-  def getLines(file: File) = Source.fromFile(file).getLines()
-
-  val file = Paths.get("src/main/resources/day1/input").toFile
+  val file = getResourceFile("day1/input")
   println("Part 1: " + getLines(file).map(getDigits).sum)
   println("Part 2: " + getLines(file).map(getDigitsWithLiterals).sum)
 }
