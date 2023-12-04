@@ -44,7 +44,7 @@ object Day3 extends App {
         case (c, colIndex) :: xs => build(makePart(digits, lastIndex) :: acc, "" + c, colIndex, xs)
       }
     }
-    // initial recursive call
+    // initialize recursive call
     build(Nil, "", -1, line.zipWithIndex.filter(_._1.isDigit).toList).reverse
   }
 
