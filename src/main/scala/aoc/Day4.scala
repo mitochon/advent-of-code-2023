@@ -28,8 +28,24 @@ object Day4 extends App {
   }
 
   val file = getResourceFile("day4/input")
+  val cards = getLines(file).map(Card(_)).toList
 
   // part1
-  val cards = getLines(file).map(Card(_)).toList
   println(cards.map(_.points()).sum)
+
+  // part2
+  def addCopies(tally: Map[Int, Int], id: Int, matches: Int): Map[Int, Int] = {
+    (id + 1 to id + matches).foldLeft(tally) {
+      case (acc, i) => acc + (i -> (tally.getOrElse(id, 1) + acc.getOrElse(i, 0)))
+    }
+  }
+
+  // initial tally is 1 for each card
+  val initialTally = cards.map(_.id).zip(List.fill(cards.size)(1)).toMap
+  val withCopies = cards.map(c => (c.id, c.matchingNumbers())).foldLeft(initialTally) {
+    case (tally, (id, num)) => addCopies(tally, id, num)
+  }
+  // debug
+  withCopies.toList.sortBy(_._1).foreach(println)
+  println(withCopies.map(_._2).sum)
 }
