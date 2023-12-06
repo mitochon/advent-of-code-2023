@@ -26,6 +26,19 @@ object Day5 extends App {
     }
   }
 
+  case class Seed(start: Long, len: Long) {
+    def getIterator: Iterator[Long] = (start until start + len).iterator
+  }
+
+  object Seed {
+    def apply(xs: Seq[Long]): Seed = {
+      xs.toList match {
+        case start :: len :: Nil => Seed(start, len)
+        case _ => throw new IllegalArgumentException(s"Invalid seed: $xs")
+      }
+    }
+  }
+
   def parseNumbers(line: String): Seq[Long] = {
     numberRegex.findAllIn(line).map(_.toLong).toSeq
   }
@@ -37,6 +50,8 @@ object Day5 extends App {
 
   val file = getResourceFile("day5/input")
   val seed = parseNumbers(getLines(file).next())
+  val seedGroups = seed.sliding(2, 2).map(Seed(_)).toList
+
   val s2s = parseSection(getLines(file), "seed-to-soil map:")
   val s2f = parseSection(getLines(file), "soil-to-fertilizer map:")
   val f2w = parseSection(getLines(file), "fertilizer-to-water map:")
@@ -54,9 +69,12 @@ object Day5 extends App {
     val f = t2h.map(e)
     val g = h2l.map(f)
     // debug
-    println(s"from: $from, a: $a, b: $b, c: $c, d: $d, e: $e, f: $f, g: $g")
+    // println(s"from: $from, a: $a, b: $b, c: $c, d: $d, e: $e, f: $f, g: $g")
     g
   }
 
+  // part1
   println(seed.map(cycle).min)
+  // part2 - run brute-force
+  println(seedGroups.map(_.getIterator.map(cycle).min).min)
 }
