@@ -4,15 +4,24 @@ object Day6 extends App {
 
   val numberRegex = """(\d+)""".r
 
-  def parseNumbers(line: String): Seq[Int] = {
-    numberRegex.findAllIn(line).map(_.toInt).toSeq
+  def parseNumbers(line: String): Seq[Long] = {
+    numberRegex.findAllIn(line).map(_.toLong).toSeq
   }
 
-  case class Race(time: Int, distance: Int) {
-    def waysToWin(): Int = {
-      (1 until time).map(t => t * (time - t))
+  case class Race(time: Long, distance: Long) {
+    def waysToWin(): Long = {
+      (1L until time).map(t => t * (time - t))
         .filter(_ > distance)
         .length
+    }
+    def smallestTimeToWin(): Option[Long] = {
+      (1L until time).find(t => t * (time - t) > distance)
+    }
+    def waysToWinFaster(): Long = {
+      smallestTimeToWin() match {
+        case Some(t) => time + 1 - (2 * t)
+        case None => 0
+      }
     }
   }
 
@@ -27,6 +36,10 @@ object Day6 extends App {
 
   println(races)
   println(wins)
-  println(wins.foldLeft(1)(_ * _))
+  println(wins.foldLeft(1L)(_ * _))
 
+  // part2
+  val race = Race(times.mkString("").toLong, distances.mkString("").toLong)
+  println(race)
+  println(race.waysToWinFaster)
 }
