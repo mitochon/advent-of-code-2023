@@ -16,7 +16,7 @@ object Day7 extends App {
           case 4 :: xs => 5
           case 3 :: 2 :: xs => 4
           case 3 :: xs => 3
-          case 2 :: 2 :: xs => 1
+          case 2 :: 2 :: xs => 2
           case 2 :: xs => 1
           case _ => 0
         }
