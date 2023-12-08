@@ -14,12 +14,12 @@ object Day7 extends App {
 
     def getKind(counts: List[Int]): Int = {
       counts match {
-        case 5 :: xs => 6
-        case 4 :: xs => 5
-        case 3 :: 2 :: xs => 4
-        case 3 :: xs => 3
-        case 2 :: 2 :: xs => 2
-        case 2 :: xs => 1
+        case 5 :: _ => 6
+        case 4 :: _ => 5
+        case 3 :: 2 :: _ => 4
+        case 3 :: _ => 3
+        case 2 :: 2 :: _ => 2
+        case 2 :: _ => 1
         case _ => 0
       }
     }
@@ -46,8 +46,8 @@ object Day7 extends App {
     def apply(line: String): CamelCard = {
       val parts = line.split("\\s")
       CamelCard(parts(0).trim, parts(1).trim.toInt)
-
     }
+
     def getCounts(hand: String): List[Int] = {
       hand.groupBy(identity).view
         .mapValues(_.size)
