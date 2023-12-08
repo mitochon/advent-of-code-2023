@@ -24,16 +24,19 @@ object Day8 extends App {
 
   val file = getResourceFile("day8/input")
 
-  val seedDirections = getLines(file).next()
-  val directions = LazyList.continually(seedDirections).flatten.iterator
   val nodes = getLines(file).filter(_.contains("=")).map(Node(_)).toList
   val nodeMap = nodes.map(n => (n.key -> n)).toMap
+  val seedDirections = getLines(file).next()
 
+  def getDirections(): Iterator[Char] = LazyList.continually(seedDirections).flatten.iterator
+
+  // part1
   def countSteps(nodeMap: Map[String, Node], directions: Iterator[Char]): Int = {
     var count = 0
     var node = nodeMap("AAA")
     while (node.key != "ZZZ") {
       val direction = directions.next()
+      // debug
       println(s" $node -> $direction -> $count")
       node = nodeMap(node.nextKey(direction))
       count = count + 1
@@ -41,6 +44,24 @@ object Day8 extends App {
     count
   }
 
-  println(nodeMap)
-  println(countSteps(nodeMap, directions))
+  println(countSteps(nodeMap, getDirections()))
+
+  // part2
+  val startNodes = nodes.filter(_.key.endsWith("A"))
+  val endNodes = nodes.filter(_.key.endsWith("Z"))
+  def countSuffix(nodeMap: Map[String, Node], start: Node, directions: Iterator[Char]): Int = {
+    var count = 0
+    var node = nodeMap(start.key)
+    while (!node.key.endsWith("Z")) {
+      val direction = directions.next()
+      node = nodeMap(node.nextKey(direction))
+      count = count + 1
+    }
+    // debug
+    println(s"End: $node - $count")
+    count
+  }
+
+  val cycles = startNodes.map(countSuffix(nodeMap, _, getDirections()))
+  println(cycles) // get the LCM of the cycles
 }
