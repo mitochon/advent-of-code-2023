@@ -6,7 +6,7 @@ object Day9 extends App {
 
   case class Report(history: Seq[Int]) {
 
-    def extrapolate(): Int = {
+    def derivations(): Seq[Seq[Int]] = {
       val derivations = ArrayBuffer(history)
       var last = history
       while (!Report.checkZeros(last)) {
@@ -14,7 +14,16 @@ object Day9 extends App {
         derivations += diff
         last = diff
       }
-      derivations.map(_.last).sum
+      derivations.toList
+    }
+
+    def extrapolate(): Int = {
+      derivations().map(_.last).sum
+    }
+
+    def extrapolateBackward(): Int = {
+      val firsts = derivations().flatMap(_.headOption).reverse
+      firsts.foldLeft(0) { case (acc, i) => i - acc }
     }
   }
 
@@ -31,4 +40,9 @@ object Day9 extends App {
   // part1
   println(extrapolations)
   println(extrapolations.sum)
+
+  // part2
+  val backwardExtrapolations = reports.map(_.extrapolateBackward)
+  println(backwardExtrapolations)
+  println(backwardExtrapolations.sum)
 }
