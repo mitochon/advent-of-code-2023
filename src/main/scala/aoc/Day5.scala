@@ -2,15 +2,13 @@ package aoc
 
 object Day5 extends App {
 
-  val numberRegex = """(\d+)""".r
-
   case class Range(dest: Long, src: Long, len: Int) {
     def inRange(from: Long): Boolean = src <= from && from < src + len
   }
 
   object Range {
     def apply(line: String): Range = {
-      parseNumbers(line).toList match {
+      parseLong(line).toList match {
         case dest :: src :: len :: Nil => Range(dest, src, len.toInt)
         case _ => throw new IllegalArgumentException(s"Invalid line: $line")
       }
@@ -39,17 +37,13 @@ object Day5 extends App {
     }
   }
 
-  def parseNumbers(line: String): Seq[Long] = {
-    numberRegex.findAllIn(line).map(_.toLong).toSeq
-  }
-
   def parseSection(lines: Iterator[String], startHeader: String): ConversionMap = {
     val section = lines.dropWhile(!_.startsWith(startHeader)).drop(1).takeWhile(_.nonEmpty).toList
     ConversionMap(section.map(Range(_)))
   }
 
   val file = getResourceFile("day5/input")
-  val seed = parseNumbers(getLines(file).next())
+  val seed = parseLong(getLines(file).next())
   val seedGroups = seed.sliding(2, 2).map(Seed(_)).toList
 
   val s2s = parseSection(getLines(file), "seed-to-soil map:")

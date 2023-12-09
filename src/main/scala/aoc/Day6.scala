@@ -2,17 +2,9 @@ package aoc
 
 object Day6 extends App {
 
-  val numberRegex = """(\d+)""".r
-
-  def parseNumbers(line: String): Seq[Long] = {
-    numberRegex.findAllIn(line).map(_.toLong).toSeq
-  }
-
   case class Race(time: Long, distance: Long) {
     def waysToWin(): Long = {
-      (1L until time).map(t => t * (time - t))
-        .filter(_ > distance)
-        .length
+      (1L until time).map(t => t * (time - t)).count(_ > distance)
     }
     def smallestTimeToWin(): Option[Long] = {
       (1L until time).find(t => t * (time - t) > distance)
@@ -27,8 +19,8 @@ object Day6 extends App {
 
   val file = getResourceFile("day6/input")
   val lines = getLines(file)
-  val times = parseNumbers(lines.next())
-  val distances = parseNumbers(lines.next())
+  val times = parseLong(lines.next())
+  val distances = parseLong(lines.next())
 
   // part1
   val races = times.zip(distances).map { case (t, d) => Race(t, d) }

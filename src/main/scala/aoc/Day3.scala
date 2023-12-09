@@ -4,8 +4,6 @@ import scala.annotation.tailrec
 
 object Day3 extends App {
 
-  val numberRegex = """(\d+)""".r
-
   case class Coord(row: Int, col: Int)
   case class Symbol(s: Char, c: Coord) {
     def adjacentCoords(): Seq[Coord] = {
@@ -21,7 +19,7 @@ object Day3 extends App {
     }
   }
   case class Part(n: Int, c: Coord) {
-    def coords(): Seq[Coord] = (0 until n.toString.size).map { i => Coord(c.row, c.col + i) }
+    def coords(): Seq[Coord] = (0 until n.toString.length).map { i => Coord(c.row, c.col + i) }
   }
 
   def parseSymbols(line: String, row: Int): Seq[Symbol] = {
@@ -32,7 +30,7 @@ object Day3 extends App {
   }
 
   def parseParts(line: String, row: Int): Seq[Part] = {
-    def makePart(digits: String, index: Int) = Part(digits.toInt, Coord(row, index + 1 - digits.size))
+    def makePart(digits: String, index: Int) = Part(digits.toInt, Coord(row, index + 1 - digits.length))
     @tailrec
     def build(acc: List[Part], digits: String, lastIndex: Int, remainder: List[(Char, Int)]): List[Part] = {
       remainder match {
