@@ -9,7 +9,17 @@ object Day10 extends App {
     val N, S, E, W = Value
   }
 
-  case class Coord(x: Int, y: Int)
+  case class Coord(x: Int, y: Int) {
+    def getBearing(other: Coord): Option[Direction.Value] = {
+      (x - other.x, y - other.y) match {
+        case (1, 0) => Some(Direction.N)
+        case (-1, 0) => Some(Direction.S)
+        case (0, 1) => Some(Direction.W)
+        case (0, -1) => Some(Direction.E)
+        case _ => None
+      }
+    }
+  }
 
   case class Tile(coord: Coord, kind: Char) {
     def next(from: Direction.Value): Option[Direction.Value] = {
@@ -89,14 +99,54 @@ object Day10 extends App {
       val path = for {
         startTile <- findStart()
         seed <- adjacentTiles(startTile).headOption
-      } yield traverse(startTile, seed, Seq(seed, startTile))
+      } yield traverse(startTile, seed, Seq(startTile, seed))
 
       path.getOrElse(Seq())
     }
 
     def getPipScores(path: Seq[Tile]): Map[Tile, Int] = {
       // From https://en.wikipedia.org/wiki/Point_in_polygon
-      Map()
+      val pathCoordMap = path.map(t => (t.coord -> t)).toMap
+      val byRow = path.groupBy(_.coord.x).view.mapValues(_.sortBy(_.coord.y)).toMap
+      val startCharReplacement = {
+        // get bearing of all tiles adjacent to the start tile, assumes certain ordering
+        val bearings = for {
+          s <- path.headOption
+          h <- path.drop(1).headOption
+          e <- path.lastOption
+          x <- s.coord.getBearing(h.coord)
+          y <- s.coord.getBearing(e.coord)
+        } yield List(x, y)
+
+        bearings.getOrElse(List()).sorted match {
+          case Direction.N :: Direction.S :: Nil => '|'
+          case Direction.E :: Direction.W :: Nil => '-'
+          case Direction.N :: Direction.E :: Nil => 'L'
+          case Direction.N :: Direction.W :: Nil => 'J'
+          case Direction.S :: Direction.E :: Nil => 'F'
+          case Direction.S :: Direction.W :: Nil => '7'
+          case _ => throw new Exception("Invalid start tile")
+        }
+      }
+
+      def getScore(c: Coord): Int = byRow.get(c.x).fold(0)(is => countIntersects(c, is))
+
+      def countIntersects(c: Coord, intersects: Seq[Tile]): Int = {
+        intersects.filter(_.coord.y < c.y)
+          .filter(_.kind != '-')
+          .map(_.kind).mkString
+          .replaceAll("S", startCharReplacement.toString) // replace S
+          .replaceAll("FJ", "|") // these next two acts as one
+          .replaceAll("L7", "|")
+          .replaceAll("F7", "") // these next two nullify each other
+          .replaceAll("LJ", "")
+          .length
+      }
+
+      tiles.map(t => pathCoordMap.get(t.coord) match {
+        case Some(t) => (t -> 0)
+        case None => (t -> getScore(t.coord))
+      }).toMap
     }
   }
 
@@ -120,5 +170,11 @@ object Day10 extends App {
   else println(path.length / 2 + 1)
 
   // part2
-  field.getPipScores(path).values.count(_ % 2 == 1)
+  val scoredTiles = field.getPipScores(path).toSeq.sortBy {
+    case (t, _) => (t.coord.x, t.coord.y)
+  }
+
+  // debug
+  scoredTiles.foreach(println)
+  println(scoredTiles.count(_._2 % 2 == 1))
 }
