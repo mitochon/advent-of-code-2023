@@ -89,9 +89,14 @@ object Day10 extends App {
       val path = for {
         startTile <- findStart()
         seed <- adjacentTiles(startTile).headOption
-      } yield traverse(startTile, seed, Seq(seed))
+      } yield traverse(startTile, seed, Seq(seed, startTile))
 
       path.getOrElse(Seq())
+    }
+
+    def getPipScores(path: Seq[Tile]): Map[Tile, Int] = {
+      // From https://en.wikipedia.org/wiki/Point_in_polygon
+      Map()
     }
   }
 
@@ -110,6 +115,10 @@ object Day10 extends App {
   val field = Field(getLines(file))
   val path = field.findPath()
 
+  // part1
   if (path.length % 2 == 0) println(path.length / 2)
   else println(path.length / 2 + 1)
+
+  // part2
+  field.getPipScores(path).values.count(_ % 2 == 1)
 }
