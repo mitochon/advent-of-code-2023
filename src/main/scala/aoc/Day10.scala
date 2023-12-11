@@ -31,12 +31,31 @@ object Day10 extends App {
     }
 
     def adjacentCoords(): Seq[(Coord, Direction.Value)] = {
+      // direction is reversed (from POV of the target tile)
       Seq(
         (Coord(coord.x - 1, coord.y), Direction.S),
         (Coord(coord.x + 1, coord.y), Direction.N),
         (Coord(coord.x, coord.y - 1), Direction.E),
         (Coord(coord.x, coord.y + 1), Direction.W)
-      )
+      ).filter {
+          case (_, direction) => Tile.validDirection(kind).contains(direction)
+        }
+    }
+  }
+
+  object Tile {
+    def validDirection(kind: Char): Set[Direction.Value] = {
+      // direction is reversed (from POV of the target tile)
+      kind match {
+        case 'F' => Set(Direction.N, Direction.W)
+        case '7' => Set(Direction.N, Direction.E)
+        case 'J' => Set(Direction.S, Direction.E)
+        case 'L' => Set(Direction.S, Direction.W)
+        case '|' => Set(Direction.N, Direction.S)
+        case '-' => Set(Direction.E, Direction.W)
+        case 'S' => Set(Direction.E, Direction.W, Direction.N, Direction.S)
+        case _ => Set()
+      }
     }
   }
 
@@ -81,13 +100,13 @@ object Day10 extends App {
       Field(xs.zipWithIndex
         .flatMap {
           case (line, x) => line.zipWithIndex.map {
-            case (c, y) => Tile(Coord(x, y), c)
+            case (c, y) => Tile(Coord(x + 1, y + 1), c)
           }
         }.toList)
     }
   }
 
-  val file = getResourceFile("day10/inputPart1")
+  val file = getResourceFile("day10/input")
   val field = Field(getLines(file))
   val path = field.findPath()
 
