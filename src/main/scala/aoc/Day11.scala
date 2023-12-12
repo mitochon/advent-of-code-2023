@@ -2,25 +2,29 @@ package aoc
 
 object Day11 extends App {
 
-  case class Coord(x: Int, y: Int) {
+  case class Coord(x: Long, y: Long) {
 
-    def expand(emptyRows: Set[Int], emptyCols: Set[Int]) = {
-      Coord(x + emptyRows.count(_ < x), y + emptyCols.count(_ < y))
+    def expand(emptyRows: Set[Int], emptyCols: Set[Int], factor: Int = 2): Coord = {
+      Coord(
+        x + emptyRows.count(_ < x) * (factor - 1),
+        y + emptyCols.count(_ < y) * (factor - 1)
+      )
     }
 
-    def distance(other: Coord): Int = {
+    def distance(other: Coord): Long = {
       Math.abs(x - other.x) + Math.abs(y - other.y)
     }
   }
 
   case class SpaceMap(galaxies: Seq[Coord], rows: Int, cols: Int) {
-    def expand(): SpaceMap = {
-      val emptyRows = (1 to rows).toSet -- galaxies.map(_.x).toSet
-      val emptyCols = (1 to cols).toSet -- galaxies.map(_.y).toSet
+
+    def expand(factor: Int = 2): SpaceMap = {
+      val emptyRows = (1 to rows).toSet -- galaxies.map(_.x).map(_.toInt).toSet
+      val emptyCols = (1 to cols).toSet -- galaxies.map(_.y).map(_.toInt).toSet
       SpaceMap(
-        galaxies.map(_.expand(emptyRows, emptyCols)),
-        rows + emptyRows.size,
-        cols + emptyCols.size
+        galaxies.map(_.expand(emptyRows, emptyCols, factor)),
+        rows + (emptyRows.size * (factor - 1)),
+        cols + (emptyCols.size * (factor - 1))
       )
     }
 
@@ -31,7 +35,7 @@ object Day11 extends App {
       }.toSeq
     }
 
-    def shortestTotalDistance(): Int = {
+    def shortestTotalDistance(): Long = {
       getPairings().map {
         case (a, b) => a.distance(b)
       }.sum
@@ -43,14 +47,14 @@ object Day11 extends App {
       val coordMap = xs.zipWithIndex
         .flatMap {
           case (line, x) => line.zipWithIndex.map {
-            case (c, y) => (Coord(x + 1, y + 1) -> c)
+            case (c, y) => Coord(x + 1, y + 1) -> c
           }
         }.toMap
 
       SpaceMap(
         coordMap.filter(_._2 == '#').keys.toSeq,
-        coordMap.keys.map(_.x).max,
-        coordMap.keys.map(_.y).max
+        coordMap.keys.map(_.x).max.toInt,
+        coordMap.keys.map(_.y).max.toInt
       )
     }
   }
@@ -60,4 +64,9 @@ object Day11 extends App {
 
   // part1
   println(spaceMap.expand().shortestTotalDistance())
+
+  // part2
+  println(spaceMap.expand(10).shortestTotalDistance())
+  println(spaceMap.expand(100).shortestTotalDistance())
+  println(spaceMap.expand(1000000).shortestTotalDistance())
 }
